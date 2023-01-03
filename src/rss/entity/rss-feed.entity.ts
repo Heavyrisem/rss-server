@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany } from 'typeorm';
 
 import { CoreEntity } from '~modules/database/core.entity';
 
@@ -8,34 +8,36 @@ import { RssItem } from './rss-item.entity';
 
 @Entity()
 export class RssFeed extends CoreEntity implements RssFeedInterface {
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
-  @Column()
+  @Column({ nullable: false })
   link: string;
 
-  @Column()
+  @Column({ nullable: false })
   rssLink: string;
 
-  @Column()
+  @Column({ nullable: false })
   lastBuildDate: Date;
 
-  @Column({ type: 'enum', enum: FEED, default: FEED.NONE })
+  @Column({ type: 'enum', enum: FEED, default: FEED.NONE, nullable: false })
   type: FEED;
 
-  @OneToMany(() => RssItem, (rssFeed) => rssFeed.id)
+  @OneToMany(() => RssItem, (rssItem) => rssItem.feed, { cascade: ['insert', 'update'] })
   items: RssItem[];
+
+  setData(data: RssFeedInterface) {
+    this.title = data.title;
+    this.link = data.link;
+    this.rssLink = data.rssLink;
+    this.lastBuildDate = data.lastBuildDate;
+    this.type = data.type;
+    this.items = data.items.map((item) => RssItem.createRssItem(item));
+  }
 
   static createRssFeed(data: RssFeedInterface): RssFeed {
     const rssFeed = new RssFeed();
-
-    rssFeed.title = data.title;
-    rssFeed.link = data.link;
-    rssFeed.rssLink = data.rssLink;
-    rssFeed.lastBuildDate = data.lastBuildDate;
-    rssFeed.type = data.type;
-    rssFeed.items = data.items.map((item) => RssItem.createRssItem(item));
-
+    rssFeed.setData(data);
     return rssFeed;
   }
 }

@@ -1,6 +1,9 @@
+import { RssFeed } from './entity/rss-feed.entity';
+import { RssItem } from './entity/rss-item.entity';
+
 export enum FEED {
-  GITHUB,
   NONE,
+  GITHUB,
 }
 
 export interface RssItemInterface {
@@ -8,6 +11,7 @@ export interface RssItemInterface {
   author: string;
   content: string;
   pubDate: Date;
+  feed: RssFeed;
 }
 export interface RssFeedInterface {
   title: string;
@@ -15,7 +19,7 @@ export interface RssFeedInterface {
   rssLink: string;
   lastBuildDate: Date;
   type: FEED;
-  items: RssItemInterface[];
+  items: RssItem[];
 }
 
 export interface GithubItem {

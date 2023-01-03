@@ -1,31 +1,41 @@
-import { Column, Entity } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { CoreEntity } from '~modules/database/core.entity';
 
 import { RssItemInterface } from '../rss.interface';
 
+import { RssFeed } from './rss-feed.entity';
+
 @Entity()
 export class RssItem extends CoreEntity implements RssItemInterface {
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
-  @Column()
+  @Column({ nullable: false })
   author: string;
 
-  @Column({ default: '' })
+  @Column({ type: 'text', nullable: false })
   content: string;
 
-  @Column()
+  @Exclude()
+  @ManyToOne(() => RssFeed, (rssFeed) => rssFeed.items, { cascade: false, nullable: false })
+  feed: RssFeed;
+
+  @Column({ nullable: false })
   pubDate: Date;
+
+  setData(data: RssItemInterface) {
+    this.title = data.title;
+    this.content = data.content;
+    this.author = data.author;
+    this.feed = data.feed;
+    this.pubDate = new Date(data.pubDate);
+  }
 
   static createRssItem(data: RssItemInterface): RssItem {
     const rssItem = new RssItem();
-
-    rssItem.title = data.title;
-    rssItem.content = data.content;
-    rssItem.author = data.author;
-    rssItem.pubDate = new Date(data.pubDate);
-
+    rssItem.setData(data);
     return rssItem;
   }
 }
