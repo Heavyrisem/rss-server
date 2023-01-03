@@ -96,13 +96,5 @@ export const getRssFeedString = (url: string) => {
     );
 };
 
-export const getLastBuildDateFromRssItems = (rssItems: RssItem[]) => {
-  return new Date(
-    Math.max(
-      ...rssItems.map((item) => {
-        // console.log(item.pubDate);
-        return item.pubDate.getTime();
-      }),
-    ),
-  );
-};
+export const getLastBuildDateFromRssItems = (rssItems: RssItem[]) =>
+  new Date(Math.max(...rssItems.map((item) => item.pubDate.getTime())));
