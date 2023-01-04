@@ -1,4 +1,3 @@
-import * as Parser from 'rss-parser';
 import { DataSource, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 
 import { ConflictException, Injectable, Logger } from '@nestjs/common';
@@ -6,10 +5,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import {
   getLastBuildDateFromRssItems,
-  getRssFeedString,
+  getRssFeedData,
   getRssFeedType,
   toRssFeed,
-} from '~modules/util/rss.util';
+} from '~modules/util/rss/rss.util';
 
 import { RssFeed } from './entity/rss-feed.entity';
 import { RssItem } from './entity/rss-item.entity';
@@ -17,7 +16,6 @@ import { RssItem } from './entity/rss-item.entity';
 @Injectable()
 export class RssService {
   private readonly logger = new Logger('RssService');
-  private readonly rssParser = new Parser();
 
   constructor(
     private readonly dataSource: DataSource,
@@ -27,10 +25,9 @@ export class RssService {
 
   async scrapRssFeed(rssLink: string) {
     const type = getRssFeedType(rssLink);
-    const rssString = await getRssFeedString(rssLink);
-    const parsedRss = await this.rssParser.parseString(rssString);
+    const rssFeedData = await getRssFeedData(rssLink, type);
 
-    return toRssFeed({ ...parsedRss, rssLink }, type);
+    return toRssFeed(rssFeedData, rssLink);
   }
 
   async subscribeRssFeed(rssLink: string) {

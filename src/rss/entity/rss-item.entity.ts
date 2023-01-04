@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne } from 'typeorm';
 
 import { CoreEntity } from '~modules/database/core.entity';
 
-import { RssItemInterface } from '../rss.interface';
+import { RssItemInterface } from '../interface/rss.interface';
 
 import { RssFeed } from './rss-feed.entity';
 
@@ -18,6 +18,9 @@ export class RssItem extends CoreEntity implements RssItemInterface {
   @Column({ type: 'text', nullable: false })
   content: string;
 
+  @Column({ nullable: true })
+  imageSrc?: string;
+
   @Exclude()
   @ManyToOne(() => RssFeed, (rssFeed) => rssFeed.items, { cascade: false, nullable: false })
   feed: RssFeed;
@@ -30,6 +33,7 @@ export class RssItem extends CoreEntity implements RssItemInterface {
     this.content = data.content;
     this.author = data.author;
     this.feed = data.feed;
+    this.imageSrc = data.imageSrc;
     this.pubDate = new Date(data.pubDate);
   }
 

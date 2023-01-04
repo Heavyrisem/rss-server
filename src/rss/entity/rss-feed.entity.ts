@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 
 import { CoreEntity } from '~modules/database/core.entity';
 
-import { FEED, RssFeedInterface } from '../rss.interface';
+import { FEED, RssFeedInterface } from '../interface/rss.interface';
 
 import { RssItem } from './rss-item.entity';
 
