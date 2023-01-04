@@ -42,7 +42,6 @@ export class RssService {
     return this.rssFeedRepository.save(rssFeed);
   }
 
-  // TODO: rssItmes 중복 검사 필요
   async addRssItems(feedId: number, rssItems: RssItem[]) {
     if (rssItems.length === 0) return rssItems;
     const queryRunner = this.dataSource.createQueryRunner();
@@ -55,21 +54,26 @@ export class RssService {
       feed.lastBuildDate = getLastBuildDateFromRssItems(rssItems);
       await queryRunner.manager.update(RssFeed, feed.id, feed);
 
-      const tasks = rssItems.map(
+      const filteredRssItems = rssItems.filter(
+        (rssItem, i) =>
+          rssItems.findIndex(
+            (compare) =>
+              rssItem.title === compare.title &&
+              rssItem.content === compare.content &&
+              rssItem.pubDate.getTime() === compare.pubDate.getTime(),
+          ) === i,
+      );
+      const tasks = filteredRssItems.map(
         (rssItem) =>
           new Promise<RssItem | null>(async (resolve, reject) => {
-            const existRssItem = await queryRunner.manager
-              .createQueryBuilder(RssItem, 'item')
-              .where(
-                'item.feedId = :feedId AND item.title = :title AND item.author = :author AND item.pubDate = :pubDate',
-                {
-                  feedId: feed.id,
-                  title: rssItem.title,
-                  author: rssItem.author,
-                  pubDate: rssItem.pubDate,
-                },
-              )
-              .getOne();
+            const existRssItem = await queryRunner.manager.findOne(RssItem, {
+              where: {
+                title: rssItem.title,
+                author: rssItem.author,
+                pubDate: rssItem.pubDate,
+                feed: { id: feed.id },
+              },
+            });
             if (existRssItem) resolve(null);
 
             const tempRssFeed = new RssFeed();

@@ -42,6 +42,7 @@ ${test('2', new Date('2023-01-02'))}
 ${test('3', new Date('2023-01-03'))}
 ${test('4', new Date('2023-01-04'))}
 ${test('4', new Date('2023-01-04'))}
+${test('5', new Date('2023-01-05'))}
 
  <entry>
   <id>yt:video:fYVzhmFn3Vc</id>
